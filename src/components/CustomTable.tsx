@@ -1,23 +1,52 @@
 import { FC } from 'react';
+import { Data } from '../App';
+import style from './CustomTable.module.css';
 
-export const CustomTable: FC = () => {
+export interface TableProps {
+  headers: Array<{
+    dataIndex: string;
+    title: string;
+    width: number;
+    sorter: true | false;
+  }>;
+  data: Array<Data>;
+  onItemClick?: (item: Object) => any;
+  onRemoveItems?: (items: Array<Object>) => any;
+  onScroll?: Function;
+  onFilter?: (mode: 'asc' | 'desc', field: string) => any;
+}
+
+export const CustomTable: FC<TableProps> = ({
+  headers,
+  data,
+  onItemClick,
+  onRemoveItems,
+}) => {
+  const mappedHeaders = headers.map((header) => (
+    <th
+      className={style.header}
+      key={header.dataIndex}
+      style={{ width: header.width }}
+    >
+      {header.title}
+    </th>
+  ));
+
+  const mappedData = data.map((item, key) => {
+    return (
+      <tr key={key + 1}>
+        <td className={style.data}>{item.name}</td>
+        <td className={style.data}>{item.rate}</td>
+      </tr>
+    );
+  });
+
   return (
-    <table>
-      <tr>
-        <th>Column 1</th>
-        <th>Column 2</th>
-        <th>Column 3</th>
-      </tr>
-      <tr>
-        <td>Data 1</td>
-        <td>Data 2</td>
-        <td>Data 3</td>
-      </tr>
-      <tr>
-        <td>Data 4</td>
-        <td>Data 5</td>
-        <td>Data 6</td>
-      </tr>
+    <table className={style.table}>
+      <thead>
+        <tr>{mappedHeaders}</tr>
+      </thead>
+      <tbody>{mappedData}</tbody>
     </table>
   );
 };
