@@ -8,7 +8,7 @@
   border-collapse: collapse;
   font-size: 1.05rem;
   overflow-y: auto;
-  /* height: 300px; */
+  height: 100vh;
 }
 
 .table input[type='checkbox'] {

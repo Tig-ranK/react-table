@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Data, Header } from '../App';
 import { Checkbox } from './Checkbox';
 import style from './CustomTable.module.css';
@@ -16,15 +16,16 @@ export interface TableProps {
 export type Item = { [key: string]: string | number };
 
 export const CustomTable: FC<TableProps> = (props) => {
-  // const [headers, setHeaders] = useState(props.headers);
-  const headers = useMemo(() => props.headers, [props.headers]);
-  const [data, setData] = useState(props.data);
+  const [limit, setLimit] = useState(10);
+  const headers = props.headers;
+  const [data, setData] = useState<Data[]>(props.data.slice(0, 10));
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   const [activeColumn, setActiveColumn] = useState('');
   const [checked, setChecked] = useState(
     data.map((item) => ({ id: item.id, check: false }))
   );
   const [selectAll, setSelectAll] = useState(false);
+
   const handleSort = (
     order: 'asc' | 'desc',
     field: string,
@@ -118,12 +119,25 @@ export const CustomTable: FC<TableProps> = (props) => {
     );
   });
 
-  const handleRemove = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    setData((prevData) =>
-      prevData.filter((item) => !checked[item.id - 1].check)
-    );
+  const handleRemove = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ): void => {
+    setData((prevData) => {
+      const selectedRows = prevData.filter(
+        (item) => checked[item.id - 1].check
+      );
+      if (selectedRows.length) {
+        props.onRemoveItems?.(selectedRows);
+      }
+      return prevData.filter((item) => !checked[item.id - 1].check);
+    });
   };
 
+  const handleMore = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    setLimit((prev) => prev + 5);
+    setData((prevData) => [...prevData, ...props.data.slice(limit, limit + 5)]);
+    // TODO complete this function
+  };
   return (
     <div className={style.container}>
       <table className={style.table}>
@@ -132,6 +146,13 @@ export const CustomTable: FC<TableProps> = (props) => {
       </table>
       <button className={style.button} onClick={handleRemove}>
         Remove Selected
+      </button>
+      <button
+        className={style.button}
+        style={{ top: '5em' }}
+        onClick={handleMore}
+      >
+        Load More
       </button>
     </div>
   );
