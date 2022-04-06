@@ -9,5 +9,8 @@ body {
 
 :root {
   --dark-green: rgb(37, 78, 57);
-  --light-green: rgb(25, 100, 61);
+}
+
+.app {
+  padding: 0.85rem;
 }

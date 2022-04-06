@@ -1,0 +1,14 @@
+.button {
+  background-color: var(--dark-green);
+  color: white;
+  padding: 0.5em 1em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: monospace;
+  text-transform: uppercase;
+  font-weight: bold;
+  height: 50px;
+}
+
+

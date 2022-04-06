@@ -1,7 +1,7 @@
 import { FC } from 'react';
-import { CustomTable } from './components/CustomTable';
-import './globalStyles.css';
+import { CustomTable } from './components/CustomTable/CustomTable';
 import data from './data.json';
+import './globalStyles.css';
 export interface Header {
   dataIndex: string;
   title: string;
@@ -25,15 +25,14 @@ export type Data = typeof data[0];
 
 export const App: FC = () => {
   return (
-    <div className='container'>
+    <div className='app'>
       <CustomTable
         headers={headers}
         data={data}
         onItemClick={(item) => console.log(item)}
         onRemoveItems={(items) => console.log(items)}
-        onScroll={() => console.log("I'm scroooolling")}
+        onScroll={() => console.log('Scrolling...')}
       />
-      {/* <Books /> */}
     </div>
   );
 };
