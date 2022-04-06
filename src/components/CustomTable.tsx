@@ -1,5 +1,6 @@
-import { FC, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { Data, Header } from '../App';
+import { Checkbox } from './Checkbox';
 import style from './CustomTable.module.css';
 
 export interface TableProps {
@@ -15,11 +16,14 @@ export type Item = { [key: string]: string | number };
 
 export const CustomTable: FC<TableProps> = (props) => {
   const [headers, setHeaders] = useState(props.headers);
+  // const headers = useMemo(() => props.headers, [props.headers]);
   const [data, setData] = useState(props.data);
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   const [activeColumn, setActiveColumn] = useState('');
+  const [checked, setChecked] = useState<boolean[]>(
+    Array(data.length).fill(false)
+  );
 
-  // TODO add an arrow for the sorted column
   const handleSort = (
     order: 'asc' | 'desc',
     field: string,
@@ -71,24 +75,35 @@ export const CustomTable: FC<TableProps> = (props) => {
     </tr>
   );
 
-  const mappedData = data.map((item, key) => (
-    <tr className={style.row} key={key + 1}>
-      {headers.map((header) => {
-        // TODO review the type safety of this
-        const data = (item as Item)[header.dataIndex];
-        return (
-          <td
-            style={{ width: header.width }}
-            onClick={() => props.onItemClick?.(item)}
-            key={header.dataIndex}
-            className={style.data}
-          >
-            {data}
-          </td>
-        );
-      })}
-    </tr>
-  ));
+  const handleCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const id = Number(e.target.id);
+    setChecked((prev) => prev.map((elem, i) => (i === id ? !elem : elem)));
+  };
+
+  const mappedData = data.map((item, key) => {
+    return (
+      <tr className={style.row} key={key + 1}>
+        <Checkbox id={key} handleCheck={handleCheck} checked={checked[key]} />
+        {headers.map((header) => {
+          const data = (item as Item)[header.dataIndex];
+          return (
+            <td
+              style={{ width: header.width }}
+              onClick={() => props.onItemClick?.(item)}
+              key={header.dataIndex}
+              className={style.data}
+            >
+              {data}
+            </td>
+          );
+        })}
+      </tr>
+    );
+  });
+
+  const handleRemove = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    setData((prevData) => prevData.filter((item) => checked[item.id - 1]));
+  };
 
   return (
     <div className={style.container}>
@@ -96,6 +111,9 @@ export const CustomTable: FC<TableProps> = (props) => {
         <thead>{mappedHeaders}</thead>
         <tbody>{mappedData}</tbody>
       </table>
+      <button style={{ height: '60px' }} onClick={handleRemove}>
+        Remove Selected
+      </button>
     </div>
   );
 };
