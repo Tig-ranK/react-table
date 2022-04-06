@@ -5,11 +5,11 @@ import { SelectAll } from '../SelectAll';
 import { SelectRow } from '../SelectRow';
 import { TableHeader } from './TableHeader';
 import { TableData } from './TableData';
-import { Button } from '../Button/Button';
 // hooks
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 // styles
 import style from './CustomTable.module.css';
+import { Buttons } from './Buttons';
 
 export interface TableProps {
   headers: Array<IHeader>;
@@ -36,7 +36,8 @@ export const CustomTable: FC<TableProps> = (props) => {
   );
   const [selectAll, setSelectAll] = useState(false);
   //  scroll
-  const scrollRef = useRef() as MutableRefObject<HTMLHRElement>;
+  const scrollUpRef = useRef() as MutableRefObject<HTMLTableRowElement>;
+  const scrollDownRef = useRef() as MutableRefObject<HTMLHRElement>;
   // continous loading
   const hasMore: boolean = data.length - limit >= 10;
   const addNewRows = () => {
@@ -44,6 +45,7 @@ export const CustomTable: FC<TableProps> = (props) => {
   };
   const { lastElementRef } = useInfiniteScroll(addNewRows, hasMore);
 
+  // handlers
   const handleSort = (
     order: 'asc' | 'desc',
     field: string,
@@ -85,8 +87,9 @@ export const CustomTable: FC<TableProps> = (props) => {
     setSelectAll((prev) => !prev);
   };
 
+  // rendered UI
   const mappedHeaders = (
-    <tr key={0}>
+    <tr ref={scrollUpRef} key={0}>
       <SelectAll checked={selectAll} handleSelectAll={handleSelectAll} />
       {headers.map((header) => (
         <TableHeader
@@ -123,6 +126,7 @@ export const CustomTable: FC<TableProps> = (props) => {
         })}
       </>
     );
+    // attaching the ref for infinite scroll
     if (limit === key + 1) {
       return (
         <tr className={style.row} ref={lastElementRef} key={key + 1}>
@@ -162,20 +166,13 @@ export const CustomTable: FC<TableProps> = (props) => {
         <thead>{mappedHeaders}</thead>
         <tbody>{mappedData}</tbody>
       </table>
-      <div className={style.buttonContainer}>
-        <Button onClick={handleRemove}>Remove Selected</Button>
-        <Button
-          onClick={() => {
-            scrollRef.current.scrollIntoView({ behavior: 'smooth' });
-          }}
-        >
-          Scroll To End
-        </Button>
-        <Button style={{ top: '5em' }} onClick={addNewRows}>
-          Add More
-        </Button>
-      </div>
-      <hr ref={scrollRef} />
+      <Buttons
+        scrollUpRef={scrollUpRef}
+        scrollDownRef={scrollDownRef}
+        addNewRows={addNewRows}
+        handleRemove={handleRemove}
+      />
+      <hr ref={scrollDownRef} />
     </div>
   );
 };
