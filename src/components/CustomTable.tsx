@@ -16,9 +16,9 @@ export interface TableProps {
 export type Item = { [key: string]: string | number };
 
 export const CustomTable: FC<TableProps> = (props) => {
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(30);
   const headers = props.headers;
-  const [data, setData] = useState<Data[]>(props.data.slice(0, 10));
+  const [data, setData] = useState<Data[]>(props.data);
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   const [activeColumn, setActiveColumn] = useState('');
   const [checked, setChecked] = useState(
@@ -94,7 +94,7 @@ export const CustomTable: FC<TableProps> = (props) => {
     );
   };
 
-  const mappedData = data.map((item, key) => {
+  const mappedData = data.slice(0, limit).map((item, key) => {
     return (
       <tr className={style.row} key={key + 1}>
         <Checkbox
@@ -133,14 +133,9 @@ export const CustomTable: FC<TableProps> = (props) => {
     });
   };
 
-  const handleMore = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    setLimit((prev) => prev + 5);
-    setData((prevData) => [...prevData, ...props.data.slice(limit, limit + 5)]);
-    // TODO complete this function
-  };
   return (
     <div className={style.container}>
-      <table className={style.table}>
+      <table onScroll={() => props.onScroll?.()} className={style.table}>
         <thead>{mappedHeaders}</thead>
         <tbody>{mappedData}</tbody>
       </table>
@@ -150,7 +145,7 @@ export const CustomTable: FC<TableProps> = (props) => {
       <button
         className={style.button}
         style={{ top: '5em' }}
-        onClick={handleMore}
+        onClick={() => setLimit((prev) => prev + 5)}
       >
         Load More
       </button>

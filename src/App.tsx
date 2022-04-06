@@ -31,6 +31,7 @@ export const App: FC = () => {
         data={data}
         onItemClick={(item) => console.log(item)}
         onRemoveItems={(items) => console.log(items)}
+        onScroll={() => console.log("I'm scroooolling")}
       />
       {/* <Books /> */}
     </div>
