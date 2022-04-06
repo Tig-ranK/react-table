@@ -20,10 +20,9 @@ export const CustomTable: FC<TableProps> = (props) => {
   const [data, setData] = useState(props.data);
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   const [activeColumn, setActiveColumn] = useState('');
-  const [checked, setChecked] = useState<boolean[]>(
-    Array(data.length).fill(false)
+  const [checked, setChecked] = useState(
+    data.map((item) => ({ id: item.id, check: false }))
   );
-
   const handleSort = (
     order: 'asc' | 'desc',
     field: string,
@@ -77,13 +76,21 @@ export const CustomTable: FC<TableProps> = (props) => {
 
   const handleCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
     const id = Number(e.target.id);
-    setChecked((prev) => prev.map((elem, i) => (i === id ? !elem : elem)));
+    setChecked((prev) =>
+      prev.map((elem) =>
+        elem.id === id ? { ...elem, check: !elem.check } : elem
+      )
+    );
   };
 
   const mappedData = data.map((item, key) => {
     return (
       <tr className={style.row} key={key + 1}>
-        <Checkbox id={key} handleCheck={handleCheck} checked={checked[key]} />
+        <Checkbox
+          id={item.id}
+          handleCheck={handleCheck}
+          checked={checked.find((i) => i.id === item.id)?.check!}
+        />
         {headers.map((header) => {
           const data = (item as Item)[header.dataIndex];
           return (
@@ -102,7 +109,9 @@ export const CustomTable: FC<TableProps> = (props) => {
   });
 
   const handleRemove = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    setData((prevData) => prevData.filter((item) => checked[item.id - 1]));
+    setData((prevData) =>
+      prevData.filter((item) => !checked[item.id - 1].check)
+    );
   };
 
   return (
