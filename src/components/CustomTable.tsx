@@ -1,14 +1,9 @@
-import { FC } from 'react';
-import { Data } from '../App';
+import { FC, useState } from 'react';
+import { Data, Header } from '../App';
 import style from './CustomTable.module.css';
 
 export interface TableProps {
-  headers: Array<{
-    dataIndex: string;
-    title: string;
-    width: number;
-    sorter: true | false;
-  }>;
+  headers: Array<Header>;
   data: Array<Data>;
   onItemClick?: (item: Object) => any;
   onRemoveItems?: (items: Array<Object>) => any;
@@ -16,37 +11,83 @@ export interface TableProps {
   onFilter?: (mode: 'asc' | 'desc', field: string) => any;
 }
 
-export const CustomTable: FC<TableProps> = ({
-  headers,
-  data,
-  onItemClick,
-  onRemoveItems,
-}) => {
-  const mappedHeaders = headers.map((header) => (
-    <th
-      className={style.header}
-      key={header.dataIndex}
-      style={{ width: header.width }}
-    >
-      {header.title}
-    </th>
+export type Item = { [key: string]: string | number };
+
+export const CustomTable: FC<TableProps> = (props) => {
+  const [headers, setHeaders] = useState(props.headers);
+  const [data, setData] = useState(props.data);
+  const [order, setOrder] = useState<'asc' | 'desc'>('desc');
+
+  const handleSort = (
+    order: 'asc' | 'desc',
+    field: string,
+    sorter: boolean
+  ): void => {
+    if (!sorter) return;
+
+    if (order === 'desc') {
+      const sorted = [...data].sort((a, b) =>
+        (a as Item)[field] > (b as Item)[field] ? 1 : -1
+      );
+      setData(sorted);
+      setOrder('asc');
+    }
+    if (order === 'asc') {
+      const sorted = [...data].sort((a, b) =>
+        (a as Item)[field] < (b as Item)[field] ? 1 : -1
+      );
+      setData(sorted);
+      setOrder('desc');
+    }
+  };
+
+  const mappedHeaders = (
+    <tr key={0}>
+      {headers.map((header) => (
+        <th
+          className={style.header}
+          key={header.dataIndex}
+          style={{ width: header.width }}
+          onClick={
+            () =>
+              props.onFilter
+                ? // Note, that onFilter doesn't care about header.sorter
+                  props.onFilter(order, header.dataIndex)
+                : handleSort(order, header.dataIndex, header.sorter)
+            // TODO check if the ternary hear causes issues
+          }
+        >
+          {header.title}
+        </th>
+      ))}
+    </tr>
+  );
+
+  const mappedData = data.map((item, key) => (
+    <tr className={style.row} key={key + 1}>
+      {headers.map((header) => {
+        // TODO review the type safety of this
+        const data = (item as Item)[header.dataIndex];
+        return (
+          <td
+            style={{ width: header.width }}
+            onClick={() => props.onItemClick?.(item)}
+            key={header.dataIndex}
+            className={style.data}
+          >
+            {data}
+          </td>
+        );
+      })}
+    </tr>
   ));
 
-  const mappedData = data.map((item, key) => {
-    return (
-      <tr key={key + 1}>
-        <td className={style.data}>{item.name}</td>
-        <td className={style.data}>{item.rate}</td>
-      </tr>
-    );
-  });
-
   return (
-    <table className={style.table}>
-      <thead>
-        <tr>{mappedHeaders}</tr>
-      </thead>
-      <tbody>{mappedData}</tbody>
-    </table>
+    <div className={style.container}>
+      <table className={style.table}>
+        <thead>{mappedHeaders}</thead>
+        <tbody>{mappedData}</tbody>
+      </table>
+    </div>
   );
 };
