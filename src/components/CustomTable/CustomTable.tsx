@@ -1,8 +1,10 @@
 import React, { FC, MutableRefObject, useRef, useState } from 'react';
-import { Data, Header } from '../../App';
+import { IData, IHeader } from '../../App';
 // components
-import { Checkbox } from '../Checkbox';
 import { SelectAll } from '../SelectAll';
+import { SelectRow } from '../SelectRow';
+import { TableHeader } from './TableHeader';
+import { TableData } from './TableData';
 import { Button } from '../Button/Button';
 // hooks
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
@@ -10,8 +12,8 @@ import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 import style from './CustomTable.module.css';
 
 export interface TableProps {
-  headers: Array<Header>;
-  data: Array<Data>;
+  headers: Array<IHeader>;
+  data: Array<IData>;
   onItemClick?: (item: Object) => any;
   onRemoveItems?: (items: Array<Object>) => any;
   onScroll?: Function;
@@ -24,7 +26,7 @@ export const CustomTable: FC<TableProps> = (props) => {
   const headers = props.headers;
   // data
   const [limit, setLimit] = useState(30);
-  const [data, setData] = useState<Data[]>(props.data);
+  const [data, setData] = useState<IData[]>(props.data);
   // sorting
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   const [activeColumn, setActiveColumn] = useState('');
@@ -67,6 +69,15 @@ export const CustomTable: FC<TableProps> = (props) => {
     }
   };
 
+  const handleCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const id = Number(e.target.id);
+    setChecked((prev) =>
+      prev.map((elem) =>
+        elem.id === id ? { ...elem, check: !elem.check } : elem
+      )
+    );
+  };
+
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     setChecked((prev) =>
       prev.map((elem) => ({ ...elem, check: e.target.checked }))
@@ -78,42 +89,22 @@ export const CustomTable: FC<TableProps> = (props) => {
     <tr key={0}>
       <SelectAll checked={selectAll} handleSelectAll={handleSelectAll} />
       {headers.map((header) => (
-        <th
-          className={style.header}
+        <TableHeader
           key={header.dataIndex}
-          style={{ width: header.width }}
-          onClick={
-            () =>
-              props.onFilter
-                ? props.onFilter(order, header.dataIndex)
-                : handleSort(order, header.dataIndex, header.sorter)
-            // TODO check if the ternary hear causes issues
-          }
-        >
-          {header.title}{' '}
-          {header.dataIndex === activeColumn
-            ? order === 'desc'
-              ? '⬇️'
-              : '⬆️'
-            : ''}
-        </th>
+          header={header}
+          activeColumn={activeColumn}
+          order={order}
+          handleSort={handleSort}
+          onFilter={props.onFilter}
+        />
       ))}
     </tr>
   );
 
-  const handleCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const id = Number(e.target.id);
-    setChecked((prev) =>
-      prev.map((elem) =>
-        elem.id === id ? { ...elem, check: !elem.check } : elem
-      )
-    );
-  };
-
   const mappedData = data.slice(0, limit).map((item, key) => {
     const children = (
       <>
-        <Checkbox
+        <SelectRow
           id={item.id}
           handleCheck={handleCheck}
           checked={checked.find((i) => i.id === item.id)?.check!}
@@ -121,14 +112,13 @@ export const CustomTable: FC<TableProps> = (props) => {
         {headers.map((header) => {
           const data = (item as Item)[header.dataIndex];
           return (
-            <td
-              style={{ width: header.width }}
-              onClick={() => props.onItemClick?.(item)}
+            <TableData
+              data={data}
+              item={item}
+              width={header.width}
               key={header.dataIndex}
-              className={style.data}
-            >
-              {data}
-            </td>
+              onItemClick={props.onItemClick}
+            />
           );
         })}
       </>

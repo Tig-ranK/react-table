@@ -1,11 +1,11 @@
 import { FC } from 'react';
 
-interface CheckBoxProps {
+interface Props {
   id: number;
   checked: boolean;
   handleCheck: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
-export const Checkbox: FC<CheckBoxProps> = ({ id, handleCheck, checked }) => (
+export const SelectRow: FC<Props> = ({ id, handleCheck, checked }) => (
   <td>
     <input
       type='checkbox'

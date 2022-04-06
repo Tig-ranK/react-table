@@ -2,14 +2,14 @@ import { FC } from 'react';
 import { CustomTable } from './components/CustomTable/CustomTable';
 import data from './data.json';
 import './globalStyles.css';
-export interface Header {
+export interface IHeader {
   dataIndex: string;
   title: string;
   width: number;
   sorter: boolean;
 }
 
-const headers: Header[] = [
+const headers: IHeader[] = [
   { dataIndex: 'id', title: 'ID', width: 80, sorter: true },
   { dataIndex: 'firstName', title: 'First name', width: 160, sorter: true },
   { dataIndex: 'lastName', title: 'Last name', width: 160, sorter: false },
@@ -21,7 +21,7 @@ const headers: Header[] = [
   },
 ];
 
-export type Data = typeof data[0];
+export type IData = typeof data[0];
 
 export const App: FC = () => {
   return (
