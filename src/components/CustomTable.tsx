@@ -2,6 +2,7 @@ import React, { FC, useMemo, useState } from 'react';
 import { Data, Header } from '../App';
 import { Checkbox } from './Checkbox';
 import style from './CustomTable.module.css';
+import { SelectAll } from './SelectAll';
 
 export interface TableProps {
   headers: Array<Header>;
@@ -15,14 +16,15 @@ export interface TableProps {
 export type Item = { [key: string]: string | number };
 
 export const CustomTable: FC<TableProps> = (props) => {
-  const [headers, setHeaders] = useState(props.headers);
-  // const headers = useMemo(() => props.headers, [props.headers]);
+  // const [headers, setHeaders] = useState(props.headers);
+  const headers = useMemo(() => props.headers, [props.headers]);
   const [data, setData] = useState(props.data);
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   const [activeColumn, setActiveColumn] = useState('');
   const [checked, setChecked] = useState(
     data.map((item) => ({ id: item.id, check: false }))
   );
+  const [selectAll, setSelectAll] = useState(false);
   const handleSort = (
     order: 'asc' | 'desc',
     field: string,
@@ -48,8 +50,16 @@ export const CustomTable: FC<TableProps> = (props) => {
     }
   };
 
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setChecked((prev) =>
+      prev.map((elem) => ({ ...elem, check: e.target.checked }))
+    );
+    setSelectAll((prev) => !prev);
+  };
+
   const mappedHeaders = (
     <tr key={0}>
+      <SelectAll checked={selectAll} handleSelectAll={handleSelectAll} />
       {headers.map((header) => (
         <th
           className={style.header}
@@ -120,7 +130,7 @@ export const CustomTable: FC<TableProps> = (props) => {
         <thead>{mappedHeaders}</thead>
         <tbody>{mappedData}</tbody>
       </table>
-      <button style={{ height: '60px' }} onClick={handleRemove}>
+      <button className={style.button} onClick={handleRemove}>
         Remove Selected
       </button>
     </div>

@@ -11,8 +11,11 @@
   /* height: 300px; */
 }
 
-.header {
-  background: rgb(37, 78, 57);
+.table input[type='checkbox'] {
+  cursor: pointer;
+}
+.table th {
+  background: var(--dark-green);
   color: white;
 
   border: 1px solid black;
@@ -30,13 +33,22 @@
 }
 
 .row:hover > td {
-  color: white;
   background-color: grey;
+  color: white;
 }
 
 .button {
-  background-color: grey;
+  position: fixed;
+  right: 1em;
+  top: 1em;
+  background-color: var(--dark-green);
   color: white;
+  padding: 0.5em 1em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
   font-family: monospace;
-  width: 100px;
+  text-transform: uppercase;
+  font-weight: bold;
+  height: 50px;
 }

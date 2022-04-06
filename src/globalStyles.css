@@ -7,3 +7,7 @@ body {
   font-family: sans-serif;
 }
 
+:root {
+  --dark-green: rgb(37, 78, 57);
+  --light-green: rgb(25, 100, 61);
+}

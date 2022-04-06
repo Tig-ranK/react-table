@@ -2,7 +2,6 @@ import { FC } from 'react';
 import { CustomTable } from './components/CustomTable';
 import './globalStyles.css';
 import data from './data.json';
-import { Books } from './components/Books';
 export interface Header {
   dataIndex: string;
   title: string;
@@ -11,7 +10,7 @@ export interface Header {
 }
 
 const headers: Header[] = [
-  { dataIndex: 'id', title: 'ID', width: 70, sorter: false },
+  { dataIndex: 'id', title: 'ID', width: 80, sorter: true },
   { dataIndex: 'firstName', title: 'First name', width: 160, sorter: true },
   { dataIndex: 'lastName', title: 'Last name', width: 160, sorter: false },
   {
