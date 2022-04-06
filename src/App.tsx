@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { CustomTable } from './components/CustomTable';
 import './globalStyles.css';
 import data from './data.json';
+import { Books } from './components/Books';
 export interface Header {
   dataIndex: string;
   title: string;
@@ -32,6 +33,7 @@ export const App: FC = () => {
         onItemClick={(item) => console.log(item)}
         onRemoveItems={(items) => console.log(items)}
       />
+      {/* <Books /> */}
     </div>
   );
 };

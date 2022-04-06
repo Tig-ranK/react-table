@@ -17,7 +17,9 @@ export const CustomTable: FC<TableProps> = (props) => {
   const [headers, setHeaders] = useState(props.headers);
   const [data, setData] = useState(props.data);
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
+  const [activeColumn, setActiveColumn] = useState('');
 
+  // TODO add an arrow for the sorted column
   const handleSort = (
     order: 'asc' | 'desc',
     field: string,
@@ -27,16 +29,18 @@ export const CustomTable: FC<TableProps> = (props) => {
 
     if (order === 'desc') {
       const sorted = [...data].sort((a, b) =>
-        (a as Item)[field] > (b as Item)[field] ? 1 : -1
+        (a as Item)[field] < (b as Item)[field] ? 1 : -1
       );
       setData(sorted);
+      setActiveColumn(field);
       setOrder('asc');
     }
     if (order === 'asc') {
       const sorted = [...data].sort((a, b) =>
-        (a as Item)[field] < (b as Item)[field] ? 1 : -1
+        (a as Item)[field] > (b as Item)[field] ? 1 : -1
       );
       setData(sorted);
+      setActiveColumn(field);
       setOrder('desc');
     }
   };
@@ -51,13 +55,17 @@ export const CustomTable: FC<TableProps> = (props) => {
           onClick={
             () =>
               props.onFilter
-                ? // Note, that onFilter doesn't care about header.sorter
-                  props.onFilter(order, header.dataIndex)
+                ? props.onFilter(order, header.dataIndex)
                 : handleSort(order, header.dataIndex, header.sorter)
             // TODO check if the ternary hear causes issues
           }
         >
-          {header.title}
+          {header.title}{' '}
+          {header.dataIndex === activeColumn
+            ? order === 'desc'
+              ? '⬇️'
+              : '⬆️'
+            : ''}
         </th>
       ))}
     </tr>
